@@ -1,40 +1,43 @@
 import os
 from google import genai
 
-# Configuration - Paste your key here or set it as an environment variable
-os.getenv("GEMINI_API_KEY")
-#GEMINI_API_KEY = ""
+# Setup
+GEMINI_API_KEY = "AIzaSyAI5o_eaRQGLAv3i5jFaIxfI6O5tVYtk_Q"
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 class SmartAssistant:
-    def __init__(self, name="Jarvis"):
-        self.name = name
+    def __init__(self):
+        # We define the "personality" of the tutor here
+        self.tutor_instruction = (
+            "You are an expert Computer Science Tutor. When a user asks about code, "
+            "don't just give the answer. Explain the 'why', mention time complexity (Big O), "
+            "and suggest best practices. Be concise but insightful."
+        )
 
-    def ask_ai(self, prompt):
+    def ask_tutor(self, user_query):
         try:
-            # Using the latest gemini-3-flash model
+            # We pass the system instruction along with the user prompt
             response = client.models.generate_content(
                 model="gemini-3-flash-preview",
-                contents=prompt
+                contents=f"{self.tutor_instruction}\n\nUser Question: {user_query}"
             )
             return response.text
         except Exception as e:
-            return f"Error connecting to AI: {e}"
+            return f"Error: {e}"
 
 def main():
     bot = SmartAssistant()
-    print(f"--- {bot.name} is now online (AI Powered) ---")
+    print("--- CS Coding Tutor Mode Active ---")
+    print("Type 'exit' to quit. Ask me anything about Python, DSA, or SQL!")
     
     while True:
-        user_input = input("\nYou: ")
-        
-        if user_input.lower() in ["exit", "quit"]:
+        prompt = input("\nStudent: ")
+        if prompt.lower() in ["exit", "quit"]:
             break
             
-        # The AI processing step
-        print(f"\n{bot.name}: Thinking...")
-        answer = bot.ask_ai(user_input)
-        print(f"\n{bot.name}: {answer}")
+        print("\nTutor: Analyzing...")
+        result = bot.ask_tutor(prompt)
+        print(f"\nTutor: {result}")
 
 if __name__ == "__main__":
     main()
