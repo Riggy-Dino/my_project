@@ -1,40 +1,40 @@
-import datetime
 import os
+from google import genai
 
-class Assistant:
-    def __init__(self, name):
+# Configuration - Paste your key here or set it as an environment variable
+os.getenv("GEMINI_API_KEY")
+#GEMINI_API_KEY = ""
+client = genai.Client(api_key=GEMINI_API_KEY)
+
+class SmartAssistant:
+    def __init__(self, name="Jarvis"):
         self.name = name
 
-    def greet(self):
-        hour = datetime.datetime.now().hour
-        greeting = "Good morning" if hour < 12 else "Good afternoon" if hour < 18 else "Good evening"
-        return f"{greeting}! I am {self.name}, your AI study partner."
-
-    def get_time(self):
-        return f"The current time is {datetime.datetime.now().strftime('%H:%M:%S')}"
-
-    def add_task(self, task):
-        with open("todo.txt", "a") as f:
-            f.write(f"{task}\n")
-        return f"Added '{task}' to your study list."
+    def ask_ai(self, prompt):
+        try:
+            # Using the latest gemini-3-flash model
+            response = client.models.generate_content(
+                model="gemini-3-flash-preview",
+                contents=prompt
+            )
+            return response.text
+        except Exception as e:
+            return f"Error connecting to AI: {e}"
 
 def main():
-    bot = Assistant("Jarvis")
-    print(bot.greet())
+    bot = SmartAssistant()
+    print(f"--- {bot.name} is now online (AI Powered) ---")
     
     while True:
-        command = input("\nHow can I help? (type 'exit' to quit): ").lower()
+        user_input = input("\nYou: ")
         
-        if "time" in command:
-            print(bot.get_time())
-        elif "add task" in command:
-            task = input("What do you need to get done? ")
-            print(bot.add_task(task))
-        elif "exit" in command:
-            print("Goodbye! Happy coding.")
+        if user_input.lower() in ["exit", "quit"]:
             break
-        else:
-            print("I'm still learning. Try 'time' or 'add task'.")
+            
+        # The AI processing step
+        print(f"\n{bot.name}: Thinking...")
+        answer = bot.ask_ai(user_input)
+        print(f"\n{bot.name}: {answer}")
 
 if __name__ == "__main__":
     main()
